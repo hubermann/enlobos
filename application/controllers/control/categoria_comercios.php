@@ -178,10 +178,9 @@ $this->form_validation->set_rules('nombre', 'Nombre', 'required');
 		
 
 		$editedcategoria_comercio = array(  
-'nombre' => $this->input->post('nombre'),
-
-'slug' => $slug,
-);
+			'nombre' => $this->input->post('nombre'),
+			'slug' => $slug,
+			);
 		#save
 		$this->session->set_flashdata('success', 'categoria_comercio Actualizado!');
 		$this->categoria_comercio->update_record($id, $editedcategoria_comercio);

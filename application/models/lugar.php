@@ -8,11 +8,28 @@ class Lugar extends CI_Model{
 
 	}
 	//all
+	public function seleccion_front($limite){
+		$this->db->select()->from('lugares')->order_by('id','ASC')->limit($limite);
+		return $this->db->get()->result();
+	}
+
+	//all
 	public function get_records($num,$start){
 		$this->db->select()->from('lugares')->order_by('id','ASC')->limit($num,$start);
 		return $this->db->get()->result();
+	}
+
+	function select_by_titulo($titulo){
+		
+		$this->db->where('slug' ,$titulo);
+		$this->db->limit(1);
+		$c = $this->db->get('lugares');
+
+		return $c->row();
 
 	}
+
+
 
 	//detail
 	public function get_record($id){

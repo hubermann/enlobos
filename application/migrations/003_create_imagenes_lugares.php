@@ -18,8 +18,8 @@ class Migration_Create_Imagenes_Lugares extends CI_Migration
                     "constraint"        	=>        11,
                 ),
                 "filename"    		=>        array(
-                    "type"                =>        "TEXT",
-                    "constraint"        	=>        100,
+                    "type"                =>        "VARCHAR",
+                    "constraint"        	=>        255,
                 ),
             )
         );

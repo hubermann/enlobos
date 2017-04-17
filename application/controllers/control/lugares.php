@@ -250,27 +250,75 @@ public function delete(){
 }
 
 
-	public function add_imagen(){
-
-	//adjunto
-	if($_FILES['adjunto']['size'] > 0){
-
-	$file  = $this->upload_file();
-
-	if ( $file['status'] != 0 ){
-		//guardo
-		$nueva_imagen = array(  
-			'lugar_id' => $this->input->post('id'),
-			'filename' => $file['filename'],
-		);
-		#save
-		$this->session->set_flashdata('success', 'Imagen cargada!');
-		$this->imagenes_lugar->add_record($nueva_imagen);	
+	public function guardar_orden(){
+		if($this->input->post('orden_imagenes')){
+			$orden  = $this->input->post('orden_imagenes');
+			//nuevo array con imagenes en el orden seleccionado
+			$nuevo_orden = array();
+			foreach ( $orden as $key => $value ) {
+				$img = $this->imagenes_lugar->get_record($key);
+				array_push($nuevo_orden, $img->filename);
+				
+			}
+	
+		}
+		
+		$this->imagenes_lugar->delete_por_lugar($this->input->post('id'));
+		foreach ($nuevo_orden as $value) {
+			$nueva_imagen = array('lugar_id' => $this->input->post('id'),'filename' => $value );
+			$this->imagenes_lugar->add_record($nueva_imagen);
+		}
 		redirect('control/lugares/imagenes/'.$this->input->post('id'));
 	}
 
 
+
+public function add_imagen(){
+	$hubo_imagen=0; 
+	$mensaje_imagen ="";
+	//adjunto
+	if($_FILES['adjunto']['size'] > 0){
+		//imagen 1
+		$file  = $this->upload_file();
+		if ( $file['status'] != 0 ){
+			//guardo
+			$nueva_imagen = array('lugar_id' => $this->input->post('id'),'filename' => $file['filename'] );
+			$this->imagenes_lugar->add_record($nueva_imagen);
+			$mensaje_imagen .= "Imagen 1 cargada. ";
+			$hubo_imagen=1;
+		}
 	}
+	//adjunto2
+	if($_FILES['adjunto2']['size'] > 0){
+		
+		//imagen 1
+		$file2  = $this->upload_file2();
+		if ( $file2['status'] != 0 ){
+			//guardo
+			$nueva_imagen = array('lugar_id' => $this->input->post('id'),'filename' => $file2['filename'] );
+			$this->imagenes_lugar->add_record($nueva_imagen);
+			$mensaje_imagen .= "Imagen 2 cargada. ";
+			$hubo_imagen=1;
+		}
+	}
+	//adjunto3
+	if($_FILES['adjunto3']['size'] > 0){
+		
+		//imagen 1
+		$file3  = $this->upload_file3();
+		if ( $file3['status'] != 0 ){
+			//guardo
+			$nueva_imagen = array('lugar_id' => $this->input->post('id'),'filename' => $file3['filename'] );
+			$this->imagenes_lugar->add_record($nueva_imagen);
+			$mensaje_imagen .= "Imagen 3 cargada. ";
+			$hubo_imagen=1;
+		}
+	}
+		if($hubo_imagen=1){
+			#save
+			$this->session->set_flashdata('success', $mensaje_imagen );
+			redirect('control/lugares/imagenes/'.$this->input->post('id'));
+		}
 	$this->session->set_flashdata('error', $file['msg']);
 	redirect('control/lugares/imagenes/'.$this->input->post('id'));
 }
@@ -313,7 +361,7 @@ public function upload_file(){
 	$file['msg'] .="<p>".$_FILES['adjunto']['name']." <br />Puede subir archivos que tengan alguna de estas extenciones: ".$exts_humano."</p>";
 	$file['status'] = 0 ;
 	}else{
-		include(APPPATH.'libraries/class.upload.php');
+		include_once(APPPATH.'libraries/class.upload.php');
 		$yukle = new upload;
 		$yukle->set_max_size(1900000);
 		$yukle->set_directory('./images-lugares');
@@ -331,25 +379,19 @@ public function upload_file(){
 		
 		
 		if($yukle->is_ok()){
-
-                if(count($this->data['thumbnail_sizes'])){
-                    foreach ($this->data['thumbnail_sizes'] as $thumb_size) {
-                        //create thumbnail
-                        $yukle->resize(1000,0);
-                        $yukle->set_thumbnail_name('tn_'.$thumb_size.'_'.$imagname);
-                        $result_thumb = $yukle->create_thumbnail();
-                        $yukle->set_thumbnail_size($thumb_size, 0);
-                    }
-                }
-
-                //UPLOAD ok
-                $file['filename'] = $imagname;
-                $file['status'] = 1;
-            }
-            else{
-                $file['status'] = 0 ;
-                $file['msg'] = 'Error al subir archivo';
-            }
+		#$yukle->resize(600,0);
+		#$yukle->set_thumbnail_name('tn_'.$random.'_'.$name_whitout_whitespaces);
+		#$yukle->create_thumbnail();
+		#$yukle->set_thumbnail_size(180, 0);
+		
+			//UPLOAD ok
+			$file['filename'] = $imagname;
+			$file['status'] = 1;
+		}
+		else{
+			$file['status'] = 0 ;
+			$file['msg'] = 'Error al subir archivo';
+		}
 		
 		//clean
 		$yukle->set_tmp_name('');
@@ -361,7 +403,139 @@ public function upload_file(){
 		
 	return $file;
 }
-
+/*******  FILE ADJUNTO  ********/
+public function upload_file2(){
+	
+	//1 = OK - 0 = Failure
+	$file = array('status' => '', 'filename' => '', 'msg' => '' );
+	
+	array('image/jpeg','image/pjpeg', 'image/jpg', 'image/png', 'image/gif','image/bmp');
+	//check extencion
+	/*
+	$file_extensions_allowed = array('application/pdf', 'application/msword', 'application/rtf', 'application/vnd.ms-excel','application/vnd.ms-powerpoint','application/zip','application/x-rar-compressed', 'text/plain');
+	$exts_humano = array('PDF', 'WORD', 'RTF', 'EXCEL', 'PowerPoint', 'ZIP', 'RAR');
+	*/
+	$file_extensions_allowed = array('image/jpeg','image/pjpeg', 'image/jpg', 'image/png', 'image/gif','image/bmp');
+	$exts_humano = array('JPG', 'JPEG', 'PNG', 'GIF');
+	
+	
+	$exts_humano = implode(', ',$exts_humano);
+	$ext = $_FILES['adjunto2']['type'];
+	#$ext = strtolower($ext);
+	if(!in_array($ext, $file_extensions_allowed)){
+		$exts = implode(', ',$file_extensions_allowed);
+		
+	$file['msg'] .="<p>".$_FILES['adjunto2']['name']." <br />Puede subir archivos que tengan alguna de estas extenciones: ".$exts_humano."</p>";
+	$file['status'] = 0 ;
+	}else{
+		include_once(APPPATH.'libraries/class.upload.php');
+		$yukle = new upload;
+		$yukle->set_max_size(1900000);
+		$yukle->set_directory('./images-lugares');
+		$yukle->set_tmp_name($_FILES['adjunto2']['tmp_name']);
+		$yukle->set_file_size($_FILES['adjunto2']['size']);
+		$yukle->set_file_type($_FILES['adjunto2']['type']);
+		$random = substr(md5(rand()),0,6);
+		$name_whitout_whitespaces = str_replace(" ","-",$_FILES['adjunto2']['name']);
+		$imagname=''.$random.'_'.$name_whitout_whitespaces;
+		#$thumbname='tn_'.$imagname;
+		$yukle->set_file_name($imagname);
+		
+	
+		$yukle->start_copy();
+		
+		
+		if($yukle->is_ok()){
+		#$yukle->resize(600,0);
+		#$yukle->set_thumbnail_name('tn_'.$random.'_'.$name_whitout_whitespaces);
+		#$yukle->create_thumbnail();
+		#$yukle->set_thumbnail_size(180, 0);
+		
+			//UPLOAD ok
+			$file['filename'] = $imagname;
+			$file['status'] = 1;
+		}
+		else{
+			$file['status'] = 0 ;
+			$file['msg'] = 'Error al subir archivo';
+		}
+		
+		//clean
+		$yukle->set_tmp_name('');
+		$yukle->set_file_size('');
+		$yukle->set_file_type('');
+		$imagname='';
+	}//fin if(extencion)	
+		
+		
+	return $file;
+}
+/*******  FILE ADJUNTO  ********/
+public function upload_file3(){
+	
+	//1 = OK - 0 = Failure
+	$file = array('status' => '', 'filename' => '', 'msg' => '' );
+	
+	array('image/jpeg','image/pjpeg', 'image/jpg', 'image/png', 'image/gif','image/bmp');
+	//check extencion
+	/*
+	$file_extensions_allowed = array('application/pdf', 'application/msword', 'application/rtf', 'application/vnd.ms-excel','application/vnd.ms-powerpoint','application/zip','application/x-rar-compressed', 'text/plain');
+	$exts_humano = array('PDF', 'WORD', 'RTF', 'EXCEL', 'PowerPoint', 'ZIP', 'RAR');
+	*/
+	$file_extensions_allowed = array('image/jpeg','image/pjpeg', 'image/jpg', 'image/png', 'image/gif','image/bmp');
+	$exts_humano = array('JPG', 'JPEG', 'PNG', 'GIF');
+	
+	
+	$exts_humano = implode(', ',$exts_humano);
+	$ext = $_FILES['adjunto3']['type'];
+	#$ext = strtolower($ext);
+	if(!in_array($ext, $file_extensions_allowed)){
+		$exts = implode(', ',$file_extensions_allowed);
+		
+	$file['msg'] .="<p>".$_FILES['adjunto3']['name']." <br />Puede subir archivos que tengan alguna de estas extenciones: ".$exts_humano."</p>";
+	$file['status'] = 0 ;
+	}else{
+		include_once(APPPATH.'libraries/class.upload.php');
+		$yukle = new upload;
+		$yukle->set_max_size(1900000);
+		$yukle->set_directory('./images-lugares');
+		$yukle->set_tmp_name($_FILES['adjunto3']['tmp_name']);
+		$yukle->set_file_size($_FILES['adjunto3']['size']);
+		$yukle->set_file_type($_FILES['adjunto3']['type']);
+		$random = substr(md5(rand()),0,6);
+		$name_whitout_whitespaces = str_replace(" ","-",$_FILES['adjunto2']['name']);
+		$imagname=''.$random.'_'.$name_whitout_whitespaces;
+		#$thumbname='tn_'.$imagname;
+		$yukle->set_file_name($imagname);
+		
+	
+		$yukle->start_copy();
+		
+		
+		if($yukle->is_ok()){
+		#$yukle->resize(600,0);
+		#$yukle->set_thumbnail_name('tn_'.$random.'_'.$name_whitout_whitespaces);
+		#$yukle->create_thumbnail();
+		#$yukle->set_thumbnail_size(180, 0);
+		
+			//UPLOAD ok
+			$file['filename'] = $imagname;
+			$file['status'] = 1;
+		}
+		else{
+			$file['status'] = 0 ;
+			$file['msg'] = 'Error al subir archivo';
+		}
+		
+		//clean
+		$yukle->set_tmp_name('');
+		$yukle->set_file_size('');
+		$yukle->set_file_type('');
+		$imagname='';
+	}//fin if(extencion)	
+		
+		
+	return $file;
+}
 } //end class
-
 ?>

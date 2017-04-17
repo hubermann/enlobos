@@ -19,8 +19,7 @@
         -->
         <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-
-
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
@@ -63,6 +62,9 @@
         
 
 
+              <li <?php if($this->uri->segment(2) == "sliders"){echo 'class="active"';} ?>>
+              <a href="<?php echo base_url('control/sliders'); ?>">Sliders</a>
+              </li>
               <li <?php if($this->uri->segment(2) == "lugares"){echo 'class="active"';} ?>>
               <a href="<?php echo base_url('control/lugares'); ?>">Lugares</a>
               </li>
@@ -79,6 +81,15 @@
               <li <?php if($this->uri->segment(2) == "eventos"){echo 'class="active"';} ?>>
               <a href="<?php echo base_url('control/eventos'); ?>">Eventos</a>
               </li>
+
+              <li <?php if($this->uri->segment(2) == "publicaciones"){echo 'class="active"';} ?>>
+              <a href="<?php echo base_url('control/publicaciones'); ?>">publicaciones</a>
+              </li>
+
+              <li <?php if($this->uri->segment(2) == "categorias_publicaciones"){echo 'class="active"';} ?>>
+              <a href="<?php echo base_url('control/categorias_publicaciones'); ?>">Categorias</a>
+              </li>
+              
               <!--
               <li>
               <a href="<?php echo base_url('control/'); ?>">Link</a>
@@ -167,7 +178,8 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
         <script src="<?php echo base_url('public_folder/js/bootstrap-datepicker.min.js'); ?>"></script>
-
+<script type="text/javascript" src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<script src="http://localhost/cersarsky/public_folder/js/jquery-ui-1.10.3.js"></script>
         <!-- 
         <script src="<?php echo base_url('public_folder/js/plugins.js'); ?>"></script>
         <script src="<?php echo base_url('public_folder/js/bootstrap.min.js'); ?>"></script>
